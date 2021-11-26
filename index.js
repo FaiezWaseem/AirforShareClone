@@ -4,7 +4,7 @@ var type = 'global'
 const maxTime = 7200000
 var AutoSave = false;
 
-
+try{
 fetch("https://ipapi.co/ip/")
 .then(function(data) {
  return data.text()
@@ -13,10 +13,12 @@ fetch("https://ipapi.co/ip/")
    ip =  data;
     })
 .catch(function(error) {
-alert('Error: '+error)
-console.log(error)
-});
 
+console.warn(error)
+});
+}catch(err){
+    console.warn(err)
+}
 
 function get($){
     return document.querySelector($); 
@@ -42,8 +44,7 @@ input.addEventListener("keyup", function(e){
     }
 } );
 input.onpaste = function(event) {
-    // console.log("paste: " + event.clipboardData.getData('text/plain'));
-    // event.preventDefault();
+    event.preventDefault();
     get('#input').value = get('#input').value + event.clipboardData.getData('text/plain')
     SaveText()
     setBtnText('copy')

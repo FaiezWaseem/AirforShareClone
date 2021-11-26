@@ -2,6 +2,9 @@ var ip = null;
 const fb = firebase.database();
 var type = 'global'
 const maxTime = 7200000
+const inputValue = null;
+
+
 fetch("https://ipapi.co/ip/")
 .then(function(data) {
  return data.text()
@@ -31,7 +34,12 @@ input.addEventListener("keydown", function(e){
 } );
 input.addEventListener("keyup", function(e){
     //for value added
-    setBtnText('save')
+         if(inputValue !== get('#input').value ){
+             setBtnText('save')
+           }else{
+            setBtnText('copy')
+           }
+
 } );
 
 
@@ -54,6 +62,7 @@ fb.ref('share/global/').on('child_added' , function(snapshot){
         }
         if(snapshot.key == 'text'){
             get('#input').value = atob(snapshot.val())
+            inputValue = atob(snapshot.val())
             setBtnText('copy')
         }
         
@@ -74,6 +83,7 @@ fb.ref('share/global/').on('child_changed' , function(snapshot){
         }
         if(snapshot.key == 'text'){
             get('#input').value = atob(snapshot.val())
+            inputValue = atob(snapshot.val())
             setBtnText('copy')
         }
         
@@ -86,6 +96,7 @@ fb.ref('share/').on('child_removed' , function(snapshot){
    
     if(snapshot.key == 'global'){
         get('#input').value = ""
+        inputValue = ""
     }else{
         get('#input').value = ""
     }

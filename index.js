@@ -2,7 +2,7 @@ var ip = null;
 const fb = firebase.database();
 var type = 'global'
 const maxTime = 7200000
-const inputValue = null;
+var AutoSave = false;
 
 
 fetch("https://ipapi.co/ip/")
@@ -27,6 +27,9 @@ const input = get('#input');
 const button = get('#btnSaveCopy');
 input.addEventListener("change", function(e){
     // on input changed 
+    SaveText()
+    setBtnText('copy')
+    AutoSave = false
 } );
 input.addEventListener("keydown", function(e){
     //for value removed
@@ -34,14 +37,18 @@ input.addEventListener("keydown", function(e){
 } );
 input.addEventListener("keyup", function(e){
     //for value added
-         if(inputValue !== get('#input').value ){
-             setBtnText('save')
-           }else{
-            setBtnText('copy')
-           }
-
+    if(!AutoSave){
+        setBtnText('save')
+    }
 } );
-
+input.onpaste = function(event) {
+    // console.log("paste: " + event.clipboardData.getData('text/plain'));
+    // event.preventDefault();
+    get('#input').value = get('#input').value + event.clipboardData.getData('text/plain')
+    SaveText()
+    setBtnText('copy')
+    AutoSave = true
+  };
 
 
 
@@ -127,6 +134,7 @@ button.addEventListener('click' , function(){
         copytext(get('#input').value)
     }else{
         SaveText()
+        AutoSave = false
     }
 })
 

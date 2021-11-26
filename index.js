@@ -42,9 +42,14 @@ fb.ref('share/global/').on('child_added' , function(snapshot){
         if(snapshot.key == 'time'){
             const d = new Date();
             const currentTime =  d.getTime()
-            if((snapshot.val() - currentTime) > maxTime){
+            if((currentTime - snapshot.val()) > maxTime){
                 
                 ClearBoard()
+                console.log( {
+                    uploadTime : snapshot.val(),
+                    currentTime : currentTime,
+                    maxTime : maxTime
+                })
             }
         }
         if(snapshot.key == 'text'){

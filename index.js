@@ -5,12 +5,12 @@ const maxTime = 7200000
 var AutoSave = false;
 
 try{
-fetch("https://ipapi.co/ip/")
+fetch("https://airforshare.com/apiv3/clip.php")
 .then(function(data) {
- return data.text()
+ return data.json()
 })
 .then(function(data) {
-   ip =  data;
+   ip =  data.clipId;
     })
 .catch(function(error) {
 
@@ -51,8 +51,16 @@ input.onpaste = function(event) {
     AutoSave = true
   };
 
+  if(type=== "global"){
+    fb.ref('share/'+ip+'/').off();
+    Global();
+}else{
+fb.ref('share/global/').off();
+LocalNetwork();
+}
 
 
+function Global(){
 fb.ref('share/global/').on('child_added' , function(snapshot){
     if(snapshot.exists()){
         if(snapshot.key == 'time'){
@@ -61,11 +69,6 @@ fb.ref('share/global/').on('child_added' , function(snapshot){
             if((currentTime - snapshot.val()) > maxTime){
                 
                 ClearBoard()
-                console.log( {
-                    uploadTime : snapshot.val(),
-                    currentTime : currentTime,
-                    maxTime : maxTime
-                })
             }
         }
         if(snapshot.key == 'text'){
@@ -109,6 +112,66 @@ fb.ref('share/').on('child_removed' , function(snapshot){
         get('#input').value = ""
     }
 })
+}
+
+function LocalNetwork(){
+    fb.ref('share/'+ip+"/").on('child_added' , function(snapshot){
+        if(snapshot.exists()){
+            if(snapshot.key == 'time'){
+                const d = new Date();
+                const currentTime =  d.getTime()
+                if((currentTime - snapshot.val()) > maxTime){
+                    
+                    ClearBoard()
+                    console.log( {
+                        uploadTime : snapshot.val(),
+                        currentTime : currentTime,
+                        maxTime : maxTime
+                    })
+                }
+            }
+            if(snapshot.key == 'text'){
+                get('#input').value = atob(snapshot.val())
+                inputValue = atob(snapshot.val())
+                setBtnText('copy')
+            }
+            
+        }else{
+            setBtnText('save')
+            console.log("Empty")
+        }
+    })
+    fb.ref('share/'+ip+"/").on('child_changed' , function(snapshot){
+        if(snapshot.exists()){
+            if(snapshot.key == 'time'){
+                const d = new Date();
+                const currentTime =  d.getTime()
+                if((snapshot.val() - currentTime) > maxTime){
+                    
+                    ClearBoard()
+                }
+            }
+            if(snapshot.key == 'text'){
+                get('#input').value = atob(snapshot.val())
+                inputValue = atob(snapshot.val())
+                setBtnText('copy')
+            }
+            
+        }else{
+            setBtnText('save')
+            console.log("Empty")
+        }
+    })
+    fb.ref('share/'+ip+"/").on('child_removed' , function(snapshot){
+       
+        if(snapshot.key == ip){
+            get('#input').value = ""
+            inputValue = ""
+        }else{
+            get('#input').value = ""
+        }
+    })    
+}
 
 
 function SaveText(){
@@ -125,6 +188,20 @@ function SaveText(){
         }else{
             alert('Please Type Something To Save')
         }
+    }else{
+        if(get('#input').value != ""){
+            const d = new Date();
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            fb.ref('share/'+ip+'/').set({
+                ip : ip,
+                text : btoa(get('#input').value),
+                date : d.getDate() + '/'+months[d.getMonth()] +'/'+ d.getFullYear(), 
+                time :  d.getTime()
+            })
+        }else{
+            alert('Please Type Something To Save')
+        }
+
     }
 }
 
@@ -168,4 +245,31 @@ function setBtnText(val){
         button.innerText =  'Save'
         button.setAttribute('data-text' , 'Save')
     }
+}
+
+
+
+document.querySelector('.select-wrapper').addEventListener('click', function() {
+    this.querySelector('.select').classList.toggle('open');
+})
+for (const option of document.querySelectorAll(".custom-option")) {
+    option.addEventListener('click', function() {
+        if (!this.classList.contains('selected')) {
+            this.parentNode.querySelector('.custom-option.selected').classList.remove('selected');
+            this.classList.add('selected');
+            this.closest('.select').querySelector('.select__trigger span').textContent = this.textContent;
+            if(this.textContent === "Global"){
+                get('#input').value = '';
+                  type= 'global'
+                  fb.ref('share/'+ip+'/').off();
+                  Global();
+            }else{
+                get('#input').value = ''
+          type = 'local'
+          fb.ref('share/global/').off();
+          LocalNetwork();
+            }
+
+        }
+    })
 }

@@ -3,7 +3,7 @@ const fb = firebase.database();
 var type = 'global'
 const maxTime = 7200000
 var AutoSave = false;
-
+//----------Get User Same IP-------------//
 try{
 fetch("https://airforshare.com/apiv3/clip.php")
 .then(function(data) {
@@ -24,7 +24,7 @@ function get($){
     return document.querySelector($); 
 }
 
-
+//------------Get Input---------------------------------//
 const input = get('#input');
 const button = get('#btnSaveCopy');
 input.addEventListener("change", function(e){
@@ -51,6 +51,7 @@ input.onpaste = function(event) {
     AutoSave = true
   };
 
+//-----------------Load Data------------------------------//  
   if(type=== "global"){
     fb.ref('share/'+ip+'/').off();
     Global();
@@ -59,7 +60,7 @@ fb.ref('share/global/').off();
 LocalNetwork();
 }
 
-
+//---------Functions Loader------------------//
 function Global(){
 fb.ref('share/global/').on('child_added' , function(snapshot){
     if(snapshot.exists()){
@@ -172,8 +173,10 @@ function LocalNetwork(){
         }
     })    
 }
+//------------------------------------------//
 
 
+//---------SAVE TEXT -----------------------------//
 function SaveText(){
     if(type === 'global' ){
         if(get('#input').value != ""){
@@ -205,7 +208,7 @@ function SaveText(){
     }
 }
 
-
+//----------COPY TEXT ON CLICK----------------------//
 button.addEventListener('click' , function(){
     const btnType = button.getAttribute('data-text')
     if(btnType == 'Copy'){
@@ -215,9 +218,6 @@ button.addEventListener('click' , function(){
         AutoSave = false
     }
 })
-
-
-
 function copytext(text) {
     var input = document.createElement('textarea');
     input.innerHTML = text;
@@ -228,7 +228,7 @@ function copytext(text) {
     return resultCopy;
   }
 
-
+//-----------------------------//
 function ClearBoard(){
     if(type == 'global'){
   fb.ref('share/').child('global').remove();
@@ -236,7 +236,6 @@ function ClearBoard(){
         fb.ref('share/').child(ip).remove();
     }
 }
-
 function setBtnText(val){
     if(val == 'copy'){
      button.innerText =  'Copy'
@@ -246,9 +245,11 @@ function setBtnText(val){
         button.setAttribute('data-text' , 'Save')
     }
 }
+//------------------------------//
 
 
 
+//------------DROPDOWN OPTIONS---------------------------------------------------------//
 document.querySelector('.select-wrapper').addEventListener('click', function() {
     this.querySelector('.select').classList.toggle('open');
 })

@@ -1,2 +1,2 @@
 # AirforShareClone
-# [Live Demo] (https://faiezwaseem.github.io/AirforShareClone/)
+# [Live Demo](http://airforshare.rf.gd/)
